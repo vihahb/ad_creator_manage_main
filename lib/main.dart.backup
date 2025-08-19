@@ -1,0 +1,36 @@
+import 'package:ads_manager_generator/screen/helpful_generator.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'version/ads_generated.dart';
+import 'version/ver_app.dart';
+
+main() async {
+  await initApplication();
+  runApp(MyApp());
+}
+
+initApplication() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
+  await Hive.initFlutter();
+  Hive.registerAdapter(AdsGeneratedAdapter());
+  await Hive.openBox<AdsGenerated>(AppConst.db);
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Ads Manager Generator',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: false,
+      ),
+      home: const HelpfulGenerator(),
+    );
+  }
+}
+

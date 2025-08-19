@@ -28,7 +28,12 @@ class CampaignRepository {
 
   /// Get campaign by ID
   OfflineCampaign? getCampaignById(int id) {
-    return _box?.values.firstWhere((campaign) => campaign.id == id, orElse: () => null);
+    if (_box == null) return null;
+    try {
+      return _box!.values.firstWhere((campaign) => campaign.id == id);
+    } catch (e) {
+      return null;
+    }
   }
 
   /// Save or update a campaign

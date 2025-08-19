@@ -1,0 +1,42 @@
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
+#include "Generated.xcconfig"
+
+// Auto-generated build flags
+OTHER_SWIFT_FLAGS = $(inherited) -D RANDOM_9oHKVB2c
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) OBFUSCATE_30814=1
+
+// Auto-generated build flags
+OTHER_SWIFT_FLAGS = $(inherited) -D RANDOM_X0Vb03B1
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) OBFUSCATE_35233=1
+
+// Auto-generated build flags
+OTHER_SWIFT_FLAGS = $(inherited) -D RANDOM_zLVyqe8O
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) OBFUSCATE_22439=1
+
+// Auto-generated build flags
+OTHER_SWIFT_FLAGS = $(inherited) -D RANDOM_1bEazBbt
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) OBFUSCATE_23197=1
+
+// Auto-generated build flags
+OTHER_SWIFT_FLAGS = $(inherited) -D RANDOM_ZGK5jF0A
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) OBFUSCATE_29753=1
+
+// Auto-generated build flags
+OTHER_SWIFT_FLAGS = $(inherited) -D RANDOM_6RjUfUXx
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) OBFUSCATE_32743=1
+
+// Auto-generated build flags
+OTHER_SWIFT_FLAGS = $(inherited) -D RANDOM_g7nrQZ6C
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) OBFUSCATE_27022=1
+
+// Auto-generated build flags
+OTHER_SWIFT_FLAGS = $(inherited) -D RANDOM_1EYNl992
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) OBFUSCATE_16511=1
+
+// Auto-generated build flags
+OTHER_SWIFT_FLAGS = $(inherited) -D RANDOM_I6fiMPKR
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) OBFUSCATE_38685=1
+
+// Auto-generated build flags
+OTHER_SWIFT_FLAGS = $(inherited) -D RANDOM_STW8gNbw
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) OBFUSCATE_25372=1

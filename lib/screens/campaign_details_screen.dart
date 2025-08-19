@@ -233,7 +233,7 @@ class _CampaignDetailsScreenState extends State<CampaignDetailsScreen> {
                     title: ChartTitle(text: 'Campaign Metrics Overview'),
                     legend: Legend(isVisible: true),
                     tooltipBehavior: TooltipBehavior(enable: true),
-                    series: <ChartSeries<_ChartData, String>>[
+                    series: <CartesianSeries<_ChartData, String>>[
                       AreaSeries<_ChartData, String>(
                         dataSource: _getChartData(),
                         xValueMapper: (_ChartData data, _) => data.category,

@@ -69,7 +69,7 @@ class _AggregateChartsWidgetState extends State<AggregateChartsWidget> {
                       title: ChartTitle(text: 'Campaign Performance Timeline'),
                       legend: Legend(isVisible: true),
                       tooltipBehavior: TooltipBehavior(enable: true),
-                      series: <ChartSeries<_TimeSeriesData, DateTime>>[
+                series: <CartesianSeries<_TimeSeriesData, DateTime>>[
                         AreaSeries<_TimeSeriesData, DateTime>(
                           dataSource: _getTimeSeriesChartData(timeSeriesData, 'impressions'),
                           xValueMapper: (_TimeSeriesData data, _) => data.date,
@@ -187,7 +187,7 @@ class _AggregateChartsWidgetState extends State<AggregateChartsWidget> {
                       title: ChartTitle(text: 'Campaign Metrics Comparison'),
                       legend: Legend(isVisible: true),
                       tooltipBehavior: TooltipBehavior(enable: true),
-                      series: <ChartSeries<_CampaignMetrics, String>>[
+                series: <CartesianSeries<_CampaignMetrics, String>>[
                         ColumnSeries<_CampaignMetrics, String>(
                           dataSource: _getCampaignMetricsData(campaigns),
                           xValueMapper: (_CampaignMetrics data, _) => data.campaignName,
