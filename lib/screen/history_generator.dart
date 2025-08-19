@@ -31,72 +31,147 @@ class _HistoryAdsGeneratorState extends State<HistoryAdsGenerator> {
   }
 
   Widget buildCampaignList(List<AdsGenerated> listData) {
-    return listData.isEmpty
-        ? const Center(child: Text('Data empty!\nCreate on Ads generator.'))
-        : ListView.builder(
-            itemCount: listData.length,
-            itemBuilder: (context, index) {
-              return InkWell(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                            builder: (context) => AdsGeneratorDetail(
-                                  ad: listData[index],
-                                  isBack: true,
-                                )));
-                  },
-                  child: campaignItem(listData[index]));
+    if (listData.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              FontAwesomeIcons.folderOpen,
+              size: 70,
+              color: Colors.grey.withOpacity(0.6),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'No campaign history',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Create new ads in the generator',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      itemCount: listData.length,
+      itemBuilder: (context, index) {
+        return AnimatedOpacity(
+          duration: Duration(milliseconds: 300 + (index * 50)),
+          opacity: 1.0,
+          curve: Curves.easeInOut,
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AdsGeneratorDetail(
+                    ad: listData[index],
+                    isBack: true,
+                  ),
+                ),
+              );
             },
-          );
+            child: campaignItem(listData[index]),
+          ),
+        );
+      },
+    );
   }
 
   var load = false;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('History Ads Generator'),
-      ),
-      body: Stack(
-        children: [
-          historyGenerator(),
-          (load)
-              ? Container(
-                  color: Colors.black54,
-                  width: double.infinity,
-                  height: double.infinity,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: MediaQuery.of(context).size.width / 4,
-                        child: const LinearProgressIndicator(),
-                      ),
-                      const SizedBox(
-                        height: 16,
-                      ),
-                      const Text(
-                        'Please wait...',
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )
-                    ],
-                  ),
-                )
-              : Container()
+        title: const Text('History', style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: theme.colorScheme.surface,
+        foregroundColor: theme.colorScheme.onSurface,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.tune_rounded),
+            onPressed: () {
+              // Filter functionality could be added here
+            },
+          ),
         ],
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              theme.colorScheme.surface,
+              theme.colorScheme.surface.withOpacity(0.8),
+            ],
+          ),
+        ),
+        child: Stack(
+          children: [
+            historyGenerator(),
+            if (load)
+              Container(
+                color: Colors.black45,
+                width: double.infinity,
+                height: double.infinity,
+                child: Center(
+                  child: Card(
+                    elevation: 6,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(height: 8),
+                          CircularProgressIndicator(color: theme.colorScheme.primary),
+                          const SizedBox(height: 24),
+                          Text(
+                            'Please wait...',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
 
-  historyGenerator(){
-    return  ValueListenableBuilder(
+  Widget historyGenerator() {
+    return ValueListenableBuilder(
       valueListenable: Hive.box<AdsGenerated>(AppConst.db).listenable(),
       builder: (context, Box<AdsGenerated> data, _) {
-        return buildCampaignList(data.values.toList());
+        final campaigns = sortCampaigns(data);
+        return buildCampaignList(campaigns);
       },
     );
   }
@@ -118,76 +193,117 @@ class _HistoryAdsGeneratorState extends State<HistoryAdsGenerator> {
     });
   }
 
-  campaignItem(AdsGenerated item) {
-    return Card(
-      elevation: 4.0,
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          children: [
-            Expanded(
-                child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(FontAwesomeIcons.fileText, color: Colors.blue),
-                    const SizedBox(width: 5),
-                    Expanded(
-                      child: Text(
-                        item.title,
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
+  Widget campaignItem(AdsGenerated item) {
+    final theme = Theme.of(context);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        borderRadius: BorderRadius.circular(16),
+        color: theme.colorScheme.surface,
+        elevation: 0,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      FontAwesomeIcons.bullhorn,
+                      color: theme.colorScheme.primary,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.title,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          item.subtitle,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    style: IconButton.styleFrom(
+                      backgroundColor: theme.colorScheme.primaryContainer,
+                      foregroundColor: theme.colorScheme.onPrimaryContainer,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                  ],
+                    onPressed: () => shareAd(item),
+                    icon: const Icon(Icons.share_rounded, size: 20),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.secondaryContainer.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                const SizedBox(
-                  height: 8,
-                ),
-                Row(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(CupertinoIcons.calendar_today,
-                        color: Colors.indigo),
-                    const SizedBox(width: 5),
+                    Icon(
+                      Icons.access_time_rounded,
+                      size: 16,
+                      color: theme.colorScheme.onSecondaryContainer,
+                    ),
+                    const SizedBox(width: 6),
                     Text(
-                      '${DateFormat.Hm().format(item.dateTime)} ${DateFormat.MMMM().format(item.dateTime)} ',
-                      style: const TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                Row(
-                  children: [
-                    const Icon(FontAwesomeIcons.alignCenter,
-                        color: Colors.orange),
-                    const SizedBox(width: 5),
-                    Expanded(
-                      child: Text(
-                        item.subtitle,
-                        style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                        overflow: TextOverflow.ellipsis,
+                      '${DateFormat('MMM d').format(item.dateTime)} at ${DateFormat.Hm().format(item.dateTime)}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSecondaryContainer,
                       ),
                     ),
                   ],
                 ),
-              ],
-            )),
-            IconButton(
-                onPressed: () {
-                  shareAd(item);
-                },
-                icon: Icon(
-                  FontAwesomeIcons.share,
-                  color: Theme.of(context).colorScheme.primary,
-                ))
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
+

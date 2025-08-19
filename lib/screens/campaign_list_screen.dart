@@ -65,17 +65,23 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
     _repository.close();
     super.dispose();
   }
+  final List<Color> _gradientColors = const [
+    Color(0xFF6A11CB),
+    Color(0xFF2575FC)
+  ];
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text('Campaign Catalog'),
-        backgroundColor: Colors.blue[700],
-        foregroundColor: Colors.white,
+        title: const Text('Campaigns', style: TextStyle(fontWeight: FontWeight.w600)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        foregroundColor: const Color(0xFF2A2D34),
         actions: [
           IconButton(
-            icon: const Icon(Icons.analytics),
+            icon: const Icon(Icons.analytics_outlined),
             onPressed: () {
               Navigator.push(
                 context,
@@ -86,7 +92,7 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.info_outline),
+            icon: const Icon(Icons.insights_outlined),
             onPressed: () {
               _showAggregateMetrics();
             },
@@ -103,57 +109,94 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
           ),
         ],
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () => _navigateToForm(),
-        backgroundColor: Colors.blue[700],
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: Colors.white,
+        foregroundColor: _gradientColors[0],
+        elevation: 4,
+        child: const Icon(Icons.add_rounded, size: 28),
       ),
     );
   }
 
   Widget _buildFilterSection() {
     return Container(
-      padding: const EdgeInsets.all(16),
-      color: Colors.grey[100],
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextField(
             decoration: InputDecoration(
               hintText: 'Search campaigns...',
-              prefixIcon: const Icon(Icons.search),
+              hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+              prefixIcon: Icon(Icons.search, color: Colors.grey[500]),
+              filled: true,
+              fillColor: const Color(0xFFF0F4F8),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             ),
             onChanged: (value) {
               _searchQuery = value;
               _filterCampaigns();
             },
           ),
+          const SizedBox(height: 16),
+          const Text('Filter by Channel',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+                color: Color(0xFF2A2D34),
+              )
+          ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              const Text('Channel: ', style: TextStyle(fontWeight: FontWeight.w500)),
-              Expanded(
-                child: DropdownButton<String>(
-                  value: _selectedChannel,
-                  isExpanded: true,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedChannel = value!;
-                      _filterCampaigns();
-                    });
-                  },
-                  items: _channels.map((channel) {
-                    return DropdownMenuItem(
-                      value: channel,
-                      child: Text(channel),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: _channels.map((channel) {
+                final isSelected = _selectedChannel == channel;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: FilterChip(
+                    label: Text(channel),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedChannel = channel;
+                        _filterCampaigns();
+                      });
+                    },
+                    backgroundColor: const Color(0xFFF0F4F8),
+                    selectedColor: const Color(0xFF3B82F6).withOpacity(0.15),
+                    checkmarkColor: const Color(0xFF3B82F6),
+                    labelStyle: TextStyle(
+                      color: isSelected ? const Color(0xFF3B82F6) : Colors.grey[700],
+                      fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      side: BorderSide(
+                        color: isSelected ? const Color(0xFF3B82F6) : Colors.transparent,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
           ),
         ],
       ),
@@ -165,24 +208,46 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.campaign_outlined,
-            size: 64,
-            color: Colors.grey[400],
+          Image.asset(
+            'assets/images/empty_campaigns.png',
+            height: 150,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => Icon(
+              Icons.campaign_outlined,
+              size: 80,
+              color: Colors.grey[300],
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           Text(
             'No campaigns found',
             style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
+              fontSize: 20,
+              color: Colors.grey[800],
+              fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Text(
             'Create your first campaign to get started',
-            style: TextStyle(color: Colors.grey[500]),
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 15,
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () => _navigateToForm(),
+            icon: const Icon(Icons.add),
+            label: const Text('New Campaign'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF3B82F6),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
           ),
         ],
       ),
@@ -191,6 +256,7 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
 
   Widget _buildCampaignList() {
     return ListView.builder(
+      padding: const EdgeInsets.symmetric(vertical: 16),
       itemCount: _filteredCampaigns.length,
       itemBuilder: (context, index) {
         final campaign = _filteredCampaigns[index];
@@ -200,101 +266,210 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
   }
 
   Widget _buildCampaignCard(OfflineCampaign campaign) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 2,
-      child: InkWell(
-        onTap: () => _navigateToDetails(campaign),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      campaign.name,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _navigateToDetails(campaign),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      height: 44,
+                      width: 44,
+                      decoration: BoxDecoration(
+                        color: _getChannelColor(campaign.channel).withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        _getChannelIcon(campaign.channel),
+                        color: _getChannelColor(campaign.channel),
+                        size: 22,
                       ),
                     ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: _getChannelColor(campaign.channel),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      campaign.channel,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            campaign.name,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF2A2D34),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            campaign.channel,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      campaign.locations.join(', '),
-                      style: TextStyle(color: Colors.grey[600]),
-                      overflow: TextOverflow.ellipsis,
+                    Container(
+                      height: 28,
+                      width: 28,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF0F4F8),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        color: Colors.grey[600],
+                        size: 14,
+                      ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F7FA),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  _buildMetricChip('Budget', '\$${campaign.budget.toStringAsFixed(0)}'),
-                  const SizedBox(width: 8),
-                  _buildMetricChip('Impressions', campaign.impressions.toString()),
-                  const SizedBox(width: 8),
-                  _buildMetricChip('CTR', '${(campaign.ctr * 100).toStringAsFixed(1)}%'),
-                ],
-              ),
-              if (campaign.minAge != null || campaign.maxAge != null || campaign.gender != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      Icon(Icons.people, size: 16, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
-                      Text(
-                        _buildTargetingText(campaign),
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      _buildStatItem(
+                        icon: Icons.attach_money_rounded,
+                        color: const Color(0xFF4CAF50),
+                        label: 'Budget',
+                        value: '\$${campaign.budget.toStringAsFixed(0)}',
+                      ),
+                      _buildDivider(),
+                      _buildStatItem(
+                        icon: Icons.visibility_outlined,
+                        color: const Color(0xFF3B82F6),
+                        label: 'Impressions',
+                        value: _formatNumber(campaign.impressions),
+                      ),
+                      _buildDivider(),
+                      _buildStatItem(
+                        icon: Icons.trending_up_rounded,
+                        color: const Color(0xFFF59E0B),
+                        label: 'CTR',
+                        value: '${(campaign.ctr * 100).toStringAsFixed(1)}%',
                       ),
                     ],
                   ),
                 ),
-            ],
+                if (campaign.locations.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.location_on_outlined, size: 16, color: Colors.grey[600]),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            campaign.locations.join(', '),
+                            style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                if (campaign.minAge != null || campaign.maxAge != null || campaign.gender != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Row(
+                      children: [
+                        Icon(Icons.people_outline, size: 16, color: Colors.grey[600]),
+                        const SizedBox(width: 6),
+                        Text(
+                          _buildTargetingText(campaign),
+                          style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildMetricChip(String label, String value) {
+  Widget _buildDivider() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        '$label: $value',
-        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-      ),
+      height: 24,
+      width: 1,
+      color: Colors.grey[300],
     );
+  }
+
+  Widget _buildStatItem({
+    required IconData icon,
+    required Color color,
+    required String label,
+    required String value,
+  }) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 14, color: color),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF2A2D34),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatNumber(int number) {
+    if (number >= 1000000) {
+      return '${(number / 1000000).toStringAsFixed(1)}M';
+    } else if (number >= 1000) {
+      return '${(number / 1000).toStringAsFixed(1)}K';
+    }
+    return number.toString();
   }
 
   String _buildTargetingText(OfflineCampaign campaign) {
@@ -315,19 +490,38 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
   Color _getChannelColor(String channel) {
     switch (channel) {
       case 'Business Card':
-        return Colors.blue;
+        return const Color(0xFF3B82F6);
       case 'Direct Mail':
-        return Colors.green;
+        return const Color(0xFF10B981);
       case 'Flyer':
-        return Colors.orange;
+        return const Color(0xFFF59E0B);
       case 'TV/Radio':
-        return Colors.purple;
+        return const Color(0xFF8B5CF6);
       case 'Billboard':
-        return Colors.red;
+        return const Color(0xFFEF4444);
       case 'Event':
-        return Colors.teal;
+        return const Color(0xFF06B6D4);
       default:
-        return Colors.grey;
+        return const Color(0xFF6B7280);
+    }
+  }
+
+  IconData _getChannelIcon(String channel) {
+    switch (channel) {
+      case 'Business Card':
+        return Icons.contact_page_outlined;
+      case 'Direct Mail':
+        return Icons.mail_outline_rounded;
+      case 'Flyer':
+        return Icons.description_outlined;
+      case 'TV/Radio':
+        return Icons.radio_outlined;
+      case 'Billboard':
+        return Icons.view_compact_outlined;
+      case 'Event':
+        return Icons.event_outlined;
+      default:
+        return Icons.category_outlined;
     }
   }
 
@@ -364,28 +558,72 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Aggregate Metrics'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Total Campaigns: ${metrics['totalCampaigns']}'),
-            Text('Total Budget: \$${metrics['totalBudget'].toStringAsFixed(2)}'),
-            Text('Total Impressions: ${metrics['totalImpressions']}'),
-            Text('Total Clicks: ${metrics['totalClicks']}'),
-            Text('Total Conversions: ${metrics['totalConversions']}'),
-            Text('Avg Cost Per Click: \$${metrics['avgCostPerClick'].toStringAsFixed(2)}'),
-            Text('Avg CTR: ${(metrics['avgCtr'] * 100).toStringAsFixed(2)}%'),
-            Text('Avg Conversion Rate: ${(metrics['avgConversionRate'] * 100).toStringAsFixed(2)}%'),
-          ],
+        title: const Text('Campaign Metrics',
+            style: TextStyle(fontWeight: FontWeight.w600)
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        content: Container(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildMetricRow('Total Campaigns', '${metrics['totalCampaigns']}', Icons.campaign_outlined),
+              _buildMetricRow('Total Budget', '\$${metrics['totalBudget'].toStringAsFixed(0)}', Icons.attach_money_rounded),
+              _buildMetricRow('Total Impressions', '${metrics['totalImpressions']}', Icons.visibility_outlined),
+              _buildMetricRow('Total Clicks', '${metrics['totalClicks']}', Icons.touch_app_outlined),
+              _buildMetricRow('Total Conversions', '${metrics['totalConversions']}', Icons.check_circle_outline),
+              _buildMetricRow('Avg Cost Per Click', '\$${metrics['avgCostPerClick'].toStringAsFixed(2)}', Icons.monetization_on_outlined),
+              _buildMetricRow('Avg CTR', '${(metrics['avgCtr'] * 100).toStringAsFixed(2)}%', Icons.trending_up_rounded),
+              _buildMetricRow('Avg Conversion Rate', '${(metrics['avgConversionRate'] * 100).toStringAsFixed(2)}%', Icons.stacked_line_chart),
+            ],
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('Close', style: TextStyle(color: Color(0xFF3B82F6))),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetricRow(String label, String value, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            height: 36,
+            width: 36,
+            decoration: BoxDecoration(
+              color: const Color(0xFF3B82F6).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: const Color(0xFF3B82F6), size: 18),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF2A2D34),
+            ),
           ),
         ],
       ),
     );
   }
 }
+
+

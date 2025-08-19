@@ -113,49 +113,93 @@ class _CampaignFormScreenState extends State<CampaignFormScreen> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.campaign != null;
-    
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(isEditing ? 'Edit Campaign' : 'Create Campaign'),
-        backgroundColor: Colors.blue[700],
+        backgroundColor: Colors.indigo[700],
+        elevation: 0,
         foregroundColor: Colors.white,
         actions: [
           if (isEditing)
             IconButton(
-              icon: const Icon(Icons.delete),
+              icon: const Icon(Icons.delete_outline_rounded),
               onPressed: _deleteCampaign,
             ),
         ],
       ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildBasicInfoSection(),
-              const SizedBox(height: 24),
-              _buildGeographicTargetingSection(),
-              const SizedBox(height: 24),
-              _buildDemographicTargetingSection(),
-              if (isEditing) ...[
-                const SizedBox(height: 24),
-                _buildMetricsSection(),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.indigo[700]!, Colors.indigo[50]!],
+            stops: const [0.0, 0.3],
+          ),
+        ),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 24),
+                  child: Card(
+                    elevation: 8,
+                    shadowColor: Colors.black26,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildBasicInfoSection(),
+                          const SizedBox(height: 32),
+                          _buildGeographicTargetingSection(),
+                          const SizedBox(height: 32),
+                          _buildDemographicTargetingSection(),
+                          if (isEditing) ...[
+                            const SizedBox(height: 32),
+                            _buildMetricsSection(),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 40),
               ],
-              const SizedBox(height: 32),
-            ],
+            ),
           ),
         ),
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 10,
+              offset: const Offset(0, -3),
+            ),
+          ],
+        ),
         child: ElevatedButton(
           onPressed: _saveCampaign,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue[700],
+            backgroundColor: Colors.indigo[700],
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 4,
           ),
           child: Text(
             isEditing ? 'Update Campaign' : 'Create Campaign',
@@ -170,16 +214,36 @@ class _CampaignFormScreenState extends State<CampaignFormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Basic Information',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        Row(
+          children: [
+            Icon(Icons.campaign_rounded, color: Colors.indigo[700], size: 24),
+            const SizedBox(width: 10),
+            const Text(
+              'Basic Information',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         TextFormField(
           controller: _nameController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Campaign Name',
-            border: OutlineInputBorder(),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.indigo[700]!, width: 2),
+            ),
+            prefixIcon: const Icon(Icons.edit_rounded),
+            filled: true,
+            fillColor: Colors.grey[50],
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -188,12 +252,26 @@ class _CampaignFormScreenState extends State<CampaignFormScreen> {
             return null;
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         DropdownButtonFormField<String>(
           value: _selectedChannel,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Channel',
-            border: OutlineInputBorder(),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.indigo[700]!, width: 2),
+            ),
+            prefixIcon: const Icon(Icons.category_rounded),
+            filled: true,
+            fillColor: Colors.grey[50],
           ),
           items: _channels.map((channel) {
             return DropdownMenuItem(
@@ -206,13 +284,29 @@ class _CampaignFormScreenState extends State<CampaignFormScreen> {
               _selectedChannel = value!;
             });
           },
+          borderRadius: BorderRadius.circular(12),
+          icon: const Icon(Icons.arrow_drop_down_circle_outlined),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         TextFormField(
           controller: _budgetController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Budget (\$)',
-            border: OutlineInputBorder(),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.indigo[700]!, width: 2),
+            ),
+            prefixIcon: const Icon(Icons.attach_money_rounded),
+            filled: true,
+            fillColor: Colors.grey[50],
           ),
           keyboardType: TextInputType.number,
           validator: (value) {
@@ -225,21 +319,42 @@ class _CampaignFormScreenState extends State<CampaignFormScreen> {
             return null;
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         Row(
           children: [
             Expanded(
               child: InkWell(
                 onTap: () => _selectDate(context, true),
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Start Date',
-                    border: OutlineInputBorder(),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey[300]!),
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.grey[50],
                   ),
-                  child: Text(
-                    _startDate != null
-                        ? '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}'
-                        : 'Select Date',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.calendar_today_rounded, size: 20),
+                      const SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Start Date',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _startDate != null
+                                ? '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}'
+                                : 'Select Date',
+                            style: TextStyle(
+                              fontWeight: _startDate != null ? FontWeight.bold : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -248,15 +363,36 @@ class _CampaignFormScreenState extends State<CampaignFormScreen> {
             Expanded(
               child: InkWell(
                 onTap: () => _selectDate(context, false),
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'End Date',
-                    border: OutlineInputBorder(),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey[300]!),
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.grey[50],
                   ),
-                  child: Text(
-                    _endDate != null
-                        ? '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}'
-                        : 'Select Date',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.event_rounded, size: 20),
+                      const SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'End Date',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _endDate != null
+                                ? '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}'
+                                : 'Select Date',
+                            style: TextStyle(
+                              fontWeight: _endDate != null ? FontWeight.bold : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -271,57 +407,110 @@ class _CampaignFormScreenState extends State<CampaignFormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Geographic Targeting',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        Row(
+          children: [
+            Icon(Icons.location_on_rounded, color: Colors.indigo[700], size: 24),
+            const SizedBox(width: 10),
+            const Text(
+              'Geographic Targeting',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         Row(
           children: [
             Expanded(
               child: TextFormField(
                 controller: _locationController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Add Location',
-                  border: OutlineInputBorder(),
                   hintText: 'Enter city, state, or region',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.indigo[700]!, width: 2),
+                  ),
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  filled: true,
+                  fillColor: Colors.grey[50],
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
             ElevatedButton(
               onPressed: _addLocation,
-              child: const Icon(Icons.add),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigo[700],
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.all(16),
+                elevation: 2,
+              ),
+              child: const Icon(Icons.add_rounded),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         if (_locations.isNotEmpty)
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: _locations.map((location) {
-              return Chip(
-                label: Text(location),
-                deleteIcon: const Icon(Icons.close, size: 18),
-                onDeleted: () {
-                  setState(() {
-                    _locations.remove(location);
-                  });
-                },
-              );
-            }).toList(),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.indigo[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.indigo[100]!),
+            ),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _locations.map((location) {
+                return Chip(
+                  label: Text(location),
+                  backgroundColor: Colors.white,
+                  labelStyle: TextStyle(color: Colors.indigo[700]),
+                  deleteIcon: Icon(Icons.close_rounded, size: 18, color: Colors.indigo[700]),
+                  onDeleted: () {
+                    setState(() {
+                      _locations.remove(location);
+                    });
+                  },
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(color: Colors.indigo[200]!),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                );
+              }).toList(),
+            ),
           ),
         if (_locations.isEmpty)
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey[300]!),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.grey[50],
             ),
-            child: const Text(
-              'No locations added. Add at least one location for targeting.',
-              style: TextStyle(color: Colors.grey),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline_rounded, color: Colors.grey[500], size: 20),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'No locations added. Add at least one location for targeting.',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              ],
             ),
           ),
       ],
@@ -332,19 +521,39 @@ class _CampaignFormScreenState extends State<CampaignFormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Demographic Targeting',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        Row(
+          children: [
+            Icon(Icons.people_alt_rounded, color: Colors.indigo[700], size: 24),
+            const SizedBox(width: 10),
+            const Text(
+              'Demographic Targeting',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         Row(
           children: [
             Expanded(
               child: TextFormField(
                 controller: _minAgeController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Min Age',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.indigo[700]!, width: 2),
+                  ),
+                  prefixIcon: const Icon(Icons.child_care_rounded),
+                  filled: true,
+                  fillColor: Colors.grey[50],
                 ),
                 keyboardType: TextInputType.number,
               ),
@@ -353,21 +562,49 @@ class _CampaignFormScreenState extends State<CampaignFormScreen> {
             Expanded(
               child: TextFormField(
                 controller: _maxAgeController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Max Age',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.indigo[700]!, width: 2),
+                  ),
+                  prefixIcon: const Icon(Icons.elderly_rounded),
+                  filled: true,
+                  fillColor: Colors.grey[50],
                 ),
                 keyboardType: TextInputType.number,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         DropdownButtonFormField<String>(
           value: _selectedGender,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Target Gender',
-            border: OutlineInputBorder(),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.indigo[700]!, width: 2),
+            ),
+            prefixIcon: const Icon(Icons.wc_rounded),
+            filled: true,
+            fillColor: Colors.grey[50],
           ),
           hint: const Text('Select Gender'),
           items: _genderOptions.map((gender) {
@@ -381,52 +618,106 @@ class _CampaignFormScreenState extends State<CampaignFormScreen> {
               _selectedGender = value;
             });
           },
+          borderRadius: BorderRadius.circular(12),
+          icon: const Icon(Icons.arrow_drop_down_circle_outlined),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         TextFormField(
           controller: _occupationController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Target Occupation',
-            border: OutlineInputBorder(),
             hintText: 'e.g., Students, Professionals, Retirees',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.indigo[700]!, width: 2),
+            ),
+            prefixIcon: const Icon(Icons.work_rounded),
+            filled: true,
+            fillColor: Colors.grey[50],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         Row(
           children: [
             Expanded(
               child: TextFormField(
                 controller: _interestController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Add Interest',
-                  border: OutlineInputBorder(),
                   hintText: 'e.g., Sports, Technology, Fashion',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.indigo[700]!, width: 2),
+                  ),
+                  prefixIcon: const Icon(Icons.interests_rounded),
+                  filled: true,
+                  fillColor: Colors.grey[50],
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
             ElevatedButton(
               onPressed: _addInterest,
-              child: const Icon(Icons.add),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigo[700],
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.all(16),
+                elevation: 2,
+              ),
+              child: const Icon(Icons.add_rounded),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         if (_interests.isNotEmpty)
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: _interests.map((interest) {
-              return Chip(
-                label: Text(interest),
-                deleteIcon: const Icon(Icons.close, size: 18),
-                onDeleted: () {
-                  setState(() {
-                    _interests.remove(interest);
-                  });
-                },
-              );
-            }).toList(),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.indigo[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.indigo[100]!),
+            ),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _interests.map((interest) {
+                return Chip(
+                  label: Text(interest),
+                  backgroundColor: Colors.white,
+                  labelStyle: TextStyle(color: Colors.indigo[700]),
+                  deleteIcon: Icon(Icons.close_rounded, size: 18, color: Colors.indigo[700]),
+                  onDeleted: () {
+                    setState(() {
+                      _interests.remove(interest);
+                    });
+                  },
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(color: Colors.indigo[200]!),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                );
+              }).toList(),
+            ),
           ),
       ],
     );
@@ -436,61 +727,103 @@ class _CampaignFormScreenState extends State<CampaignFormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Campaign Metrics',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 16),
         Row(
           children: [
-            Expanded(
-              child: TextFormField(
-                controller: _impressionsController,
-                decoration: const InputDecoration(
-                  labelText: 'Impressions',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: TextFormField(
-                controller: _clicksController,
-                decoration: const InputDecoration(
-                  labelText: 'Clicks',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-              ),
+            Icon(Icons.analytics_rounded, color: Colors.indigo[700], size: 24),
+            const SizedBox(width: 10),
+            const Text(
+              'Campaign Metrics',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ],
         ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: TextFormField(
-                controller: _conversionsController,
-                decoration: const InputDecoration(
-                  labelText: 'Conversions',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
+        const SizedBox(height: 24),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.indigo[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.indigo[100]!),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _impressionsController,
+                      decoration: InputDecoration(
+                        labelText: 'Impressions',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey[300]!),
+                        ),
+                        prefixIcon: const Icon(Icons.visibility_rounded),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _clicksController,
+                      decoration: InputDecoration(
+                        labelText: 'Clicks',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey[300]!),
+                        ),
+                        prefixIcon: const Icon(Icons.touch_app_rounded),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: TextFormField(
-                controller: _costController,
-                decoration: const InputDecoration(
-                  labelText: 'Actual Cost (\$)',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _conversionsController,
+                      decoration: InputDecoration(
+                        labelText: 'Conversions',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey[300]!),
+                        ),
+                        prefixIcon: const Icon(Icons.check_circle_outline_rounded),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _costController,
+                      decoration: InputDecoration(
+                        labelText: 'Actual Cost (\$)',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey[300]!),
+                        ),
+                        prefixIcon: const Icon(Icons.attach_money_rounded),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
@@ -628,16 +961,36 @@ class _CampaignFormScreenState extends State<CampaignFormScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Campaign'),
-        content: const Text('Are you sure you want to delete this campaign? This action cannot be undone.'),
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.red[700], size: 28),
+            const SizedBox(width: 10),
+            const Text('Delete Campaign'),
+          ],
+        ),
+        content: const Text(
+          'Are you sure you want to delete this campaign? This action cannot be undone.',
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.grey[700]),
+            ),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red[700],
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
             child: const Text('Delete'),
           ),
         ],
@@ -649,9 +1002,19 @@ class _CampaignFormScreenState extends State<CampaignFormScreen> {
         await widget.repository.deleteCampaign(widget.campaign!.id);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Campaign deleted successfully'),
-              backgroundColor: Colors.green,
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle_outline, color: Colors.white),
+                  const SizedBox(width: 16),
+                  const Text('Campaign deleted successfully'),
+                ],
+              ),
+              backgroundColor: Colors.green[700],
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
           );
           Navigator.pop(context, true);
@@ -660,8 +1023,18 @@ class _CampaignFormScreenState extends State<CampaignFormScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error deleting campaign: $e'),
-              backgroundColor: Colors.red,
+              content: Row(
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.white),
+                  const SizedBox(width: 16),
+                  Expanded(child: Text('Error deleting campaign: $e')),
+                ],
+              ),
+              backgroundColor: Colors.red[700],
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
           );
         }
