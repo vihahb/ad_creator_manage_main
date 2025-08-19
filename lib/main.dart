@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'screens/campaign_list_screen.dart';
+import 'screens/demo_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +22,7 @@ class CampaignManagerApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
-      home: const CampaignListScreen(),
+      home: const DemoScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
